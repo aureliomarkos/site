@@ -93,7 +93,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-utils/
+
 
 # Spyder project settings
 .spyderproject
@@ -128,6 +128,9 @@ cython_debug/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Utils
+utils/
 
 # macOS
 .DS_Store
