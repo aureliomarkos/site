@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     root.classList.toggle("dark", dark)
     themeIcon.setAttribute("data-lucide", dark ? "sun" : "moon")
     themeToggle.setAttribute("aria-label", dark ? "Ativar modo claro" : "Ativar modo escuro")
-    lucide.createIcons()
+    if (typeof lucide !== "undefined") lucide.createIcons()
   }
 
   const stored = localStorage.getItem("markosdev-theme")
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     chatWindow.hidden = !open
     chatFabIcon.setAttribute("data-lucide", open ? "x" : "message-square")
     chatToggle.setAttribute("aria-label", open ? "Fechar chat" : "Abrir chat")
-    lucide.createIcons()
+    if (typeof lucide !== "undefined") lucide.createIcons()
     if (open) chatInput.focus()
   }
 
@@ -327,5 +327,280 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   /* ---------- Renderiza ícones lucide ---------- */
-  lucide.createIcons()
+  if (typeof lucide !== "undefined") lucide.createIcons()
+})
+
+/* ============================================
+   Painel Administrativo
+============================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  const ADMIN_PASSWORD_KEY = "markosdev_admin_token"
+
+  // Elementos
+  const loginSection = document.getElementById("admin-login")
+  const dashboardSection = document.getElementById("admin-dashboard")
+  const passwordInput = document.getElementById("admin-password")
+  const loginBtn = document.getElementById("admin-login-btn")
+  const loginError = document.getElementById("admin-login-error")
+  const newsList = document.getElementById("admin-news-list")
+  const newBtn = document.getElementById("admin-new-btn")
+  const modal = document.getElementById("admin-modal")
+  const modalClose = document.getElementById("admin-modal-close")
+  const modalCancel = document.getElementById("admin-modal-cancel")
+  const modalForm = document.getElementById("admin-modal-form")
+  const modalTitle = document.getElementById("admin-modal-title")
+  const editId = document.getElementById("admin-edit-id")
+  const editTitle = document.getElementById("admin-edit-title")
+  const editContent = document.getElementById("admin-edit-content")
+  const editImage = document.getElementById("admin-edit-image")
+  const editActiveGroup = document.getElementById("admin-edit-active-group")
+  const editActive = document.getElementById("admin-edit-active")
+
+  let adminToken = localStorage.getItem(ADMIN_PASSWORD_KEY) || ""
+
+  function getHeaders() {
+    return {
+      "Content-Type": "application/json",
+      "x-admin-password": adminToken,
+    }
+  }
+
+  // Verificar se já está autenticado ao carregar
+  if (adminToken) {
+    verifyAndLoad()
+  }
+
+  // Login
+  loginBtn.addEventListener("click", async () => {
+    const password = passwordInput.value.trim()
+    if (!password) {
+      loginError.textContent = "Digite a senha."
+      loginError.hidden = false
+      return
+    }
+
+    // Estado de carregamento
+    const originalText = loginBtn.innerHTML
+    loginBtn.disabled = true
+    loginBtn.innerHTML = '<i data-lucide="loader"></i> Entrando...'
+    if (typeof lucide !== "undefined") lucide.createIcons()
+
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      })
+
+      if (!res.ok) {
+        loginError.textContent = "Senha inválida. Tente novamente."
+        loginError.hidden = false
+        return
+      }
+
+      loginError.hidden = true
+      adminToken = password
+      localStorage.setItem(ADMIN_PASSWORD_KEY, password)
+      passwordInput.value = ""
+      showDashboard()
+    } catch (err) {
+      loginError.textContent = "Erro de conexão com o servidor."
+      loginError.hidden = false
+    } finally {
+      loginBtn.disabled = false
+      loginBtn.innerHTML = originalText
+      if (typeof lucide !== "undefined") lucide.createIcons()
+    }
+  })
+
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") loginBtn.click()
+  })
+
+  async function verifyAndLoad() {
+    try {
+      const res = await fetch("/api/admin/news", {
+        headers: getHeaders(),
+      })
+      if (res.ok) {
+        showDashboard()
+      } else {
+        localStorage.removeItem(ADMIN_PASSWORD_KEY)
+        adminToken = ""
+      }
+    } catch {
+      localStorage.removeItem(ADMIN_PASSWORD_KEY)
+      adminToken = ""
+    }
+  }
+
+  function showDashboard() {
+    loginSection.hidden = true
+    dashboardSection.hidden = false
+    loadNews()
+  }
+
+  // Carregar notícias
+  async function loadNews() {
+    try {
+      const res = await fetch("/api/admin/news", { headers: getHeaders() })
+      if (!res.ok) throw new Error("Falha ao carregar")
+
+      const news = await res.json()
+      renderNewsList(news)
+    } catch (err) {
+      newsList.innerHTML = `<p class="admin-empty">Erro ao carregar notícias.</p>`
+    }
+  }
+
+  function renderNewsList(news) {
+    if (news.length === 0) {
+      newsList.innerHTML = `<p class="admin-empty">Nenhuma notícia cadastrada. Clique em "Nova Notícia" para criar.</p>`
+      return
+    }
+
+    newsList.innerHTML = ""
+    news.forEach((item) => {
+      const div = document.createElement("div")
+      div.className = "admin-news-item"
+
+      const status = item.is_active ? "" : " [Inativa]"
+      const date = new Date(item.published_at).toLocaleDateString("pt-BR")
+
+      div.innerHTML = `
+        <div class="admin-news-info">
+          <div class="admin-news-title">${item.title}${status}</div>
+          <div class="admin-news-meta">${date} · ID: ${item.id}</div>
+        </div>
+        <div class="admin-news-actions">
+          <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Editar">
+            <i data-lucide="pencil"></i>
+          </button>
+          <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Excluir">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+      `
+
+      newsList.appendChild(div)
+    })
+
+    if (typeof lucide !== "undefined") lucide.createIcons()
+
+    // Eventos de editar
+    newsList.querySelectorAll(".edit-btn").forEach((btn) => {
+      btn.addEventListener("click", () => openEdit(Number(btn.dataset.id)))
+    })
+
+    // Eventos de excluir
+    newsList.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", () => confirmDelete(Number(btn.dataset.id)))
+    })
+  }
+
+  // Nova notícia
+  newBtn.addEventListener("click", () => openNew())
+
+  function openNew() {
+    modalTitle.textContent = "Nova Notícia"
+    editId.value = ""
+    editTitle.value = ""
+    editContent.value = ""
+    editImage.value = ""
+    editActiveGroup.hidden = true
+    modal.hidden = false
+  }
+
+  async function openEdit(id) {
+    try {
+      const res = await fetch(`/api/admin/news/${id}`, { headers: getHeaders() })
+      if (!res.ok) throw new Error("Erro ao carregar notícia")
+
+      const news = await res.json()
+      modalTitle.textContent = "Editar Notícia"
+      editId.value = news.id
+      editTitle.value = news.title
+      editContent.value = news.content
+      editImage.value = news.image_url || ""
+      editActiveGroup.hidden = false
+      editActive.checked = news.is_active
+      modal.hidden = false
+    } catch (err) {
+      alert("Erro ao carregar notícia para edição.")
+    }
+  }
+
+  // Fechar modal
+  function closeModal() {
+    modal.hidden = true
+  }
+
+  modalClose.addEventListener("click", closeModal)
+  modalCancel.addEventListener("click", closeModal)
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal()
+  })
+
+  // Salvar (criar ou atualizar)
+  modalForm.addEventListener("submit", async (e) => {
+    e.preventDefault()
+
+    const id = editId.value
+    const title = editTitle.value.trim()
+    const content = editContent.value.trim()
+    const image_url = editImage.value.trim() || null
+    const is_active = editActive.checked
+
+    const saveBtn = document.getElementById("admin-modal-save")
+    const originalText = saveBtn.innerHTML
+    saveBtn.disabled = true
+    saveBtn.innerHTML = "Salvando..."
+
+    try {
+      if (id) {
+        // Atualizar
+        const body = { title, content, image_url, is_active }
+        const res = await fetch(`/api/admin/news/${id}`, {
+          method: "PUT",
+          headers: getHeaders(),
+          body: JSON.stringify(body),
+        })
+        if (!res.ok) throw new Error("Erro ao atualizar")
+      } else {
+        // Criar
+        const body = { title, content, image_url }
+        const res = await fetch("/api/admin/news", {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(body),
+        })
+        if (!res.ok) throw new Error("Erro ao criar")
+      }
+
+      closeModal()
+      loadNews()
+    } catch (err) {
+      alert("Erro ao salvar notícia.")
+    } finally {
+      saveBtn.disabled = false
+      saveBtn.innerHTML = originalText
+    }
+  })
+
+  // Excluir
+  async function confirmDelete(id) {
+    if (!confirm("Tem certeza que deseja excluir esta notícia?")) return
+
+    try {
+      const res = await fetch(`/api/admin/news/${id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      })
+      if (!res.ok) throw new Error("Erro ao excluir")
+
+      loadNews()
+    } catch (err) {
+      alert("Erro ao excluir notícia.")
+    }
+  }
 })

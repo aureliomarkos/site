@@ -56,6 +56,11 @@
             <i data-lucide="mail"></i> <span class="nav-text">Contato</span>
           </a>
         </li>
+        <li>
+          <a href="#admin" class="nav-item" data-close-menu>
+            <i data-lucide="shield"></i> <span class="nav-text">Admin</span>
+          </a>
+        </li>
       </ul>
     </nav>
 
@@ -295,6 +300,45 @@
           </div>
         </div>
       </section>
+
+      <!-- Admin -->
+      <section id="admin" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="mono-label">// administrativo</p>
+            <h2 class="section-title">Painel Administrativo</h2>
+            <p class="section-desc">Gerencie as notícias do blog.</p>
+          </div>
+
+          <!-- Login -->
+          <div id="admin-login" class="admin-card">
+            <div class="admin-login-form">
+              <div class="form-group">
+                <label for="admin-password">Senha administrativa</label>
+                <input type="password" id="admin-password" placeholder="Digite a senha..." />
+              </div>
+              <button id="admin-login-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
+                <i data-lucide="log-in"></i> Entrar
+              </button>
+              <p id="admin-login-error" class="admin-error" hidden>Senha inválida. Tente novamente.</p>
+            </div>
+          </div>
+
+          <!-- Dashboard (oculto até login) -->
+          <div id="admin-dashboard" class="admin-card" hidden>
+            <div class="admin-toolbar">
+              <h3 class="admin-toolbar-title">Notícias</h3>
+              <button id="admin-new-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
+                <i data-lucide="plus"></i> Nova Notícia
+              </button>
+            </div>
+
+            <div id="admin-news-list" class="admin-news-list">
+              <!-- preenchido via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- Rodapé -->
@@ -341,8 +385,47 @@
     </button>
   </div>
 
+  <!-- Modal Admin -->
+  <div id="admin-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="admin-modal-title" class="modal-title">Nova Notícia</h3>
+        <button id="admin-modal-close" class="icon-btn" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="admin-modal-form" class="modal-form">
+        <input type="hidden" id="admin-edit-id" />
+        <div class="form-group">
+          <label for="admin-edit-title">Título</label>
+          <input type="text" id="admin-edit-title" required maxlength="250" />
+        </div>
+        <div class="form-group">
+          <label for="admin-edit-content">Conteúdo</label>
+          <textarea id="admin-edit-content" rows="6" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="admin-edit-image">URL da Imagem</label>
+          <input type="url" id="admin-edit-image" placeholder="https://..." />
+        </div>
+        <div class="form-group" id="admin-edit-active-group" hidden>
+          <label class="checkbox-label">
+            <input type="checkbox" id="admin-edit-active" checked />
+            Ativo (publicado)
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="admin-modal-cancel" class="btn bordered">Cancelar</button>
+          <button type="submit" id="admin-modal-save" class="btn btn-primary" style="width:auto;opacity:1">
+            <i data-lucide="save"></i> Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=1.1.0"></script>
 </body>
 
 </html>

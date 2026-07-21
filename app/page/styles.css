@@ -182,7 +182,7 @@ svg {
 ============================================ */
 .sidebar {
   position: fixed;
-  inset: 4rem auto 0 0;
+  inset: 4rem auto 4.5rem 0;
   z-index: 90;
   display: flex;
   flex-direction: column;
@@ -1344,7 +1344,6 @@ main {
   }
 
   .footer {
-    left: 4.5rem;
     padding-left: 2rem;
     padding-right: 2rem;
   }
@@ -1466,4 +1465,220 @@ main {
 .contact-btn.bordered:hover {
   background: var(--muted);
   color: var(--foreground);
+}
+
+/* ============================================
+   Painel Administrativo
+============================================ */
+.admin-card {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  margin-top: 1.5rem;
+}
+
+.admin-login-form {
+  max-width: 24rem;
+}
+
+.admin-login-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.admin-login-form input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.admin-login-form input[type="password"]:focus {
+  outline: 2px solid var(--primary);
+  border-color: transparent;
+}
+
+.admin-error {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-toolbar-title {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.admin-news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-news-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  transition: border-color 0.15s;
+}
+
+.admin-news-item:hover {
+  border-color: var(--primary);
+}
+
+.admin-news-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-news-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-news-meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.125rem;
+}
+
+.admin-news-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.admin-news-actions .icon-btn {
+  width: 2rem;
+  height: 2rem;
+}
+
+.admin-news-actions .icon-btn.edit-btn {
+  color: var(--accent);
+}
+
+.admin-news-actions .icon-btn.delete-btn {
+  color: #ef4444;
+}
+
+.admin-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   Modal
+============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--foreground) 50%, transparent);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal {
+  width: 100%;
+  max-width: 36rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.modal-form {
+  padding: 1.25rem;
+}
+
+.modal-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.modal-form input[type="text"],
+.modal-form input[type="url"],
+.modal-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+  outline: 2px solid var(--primary);
+  border-color: transparent;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }

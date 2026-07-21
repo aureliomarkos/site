@@ -22,12 +22,30 @@ class ContactMessageResponse(BaseModel):
         from_attributes = True
 
 
+class NewsCreate(BaseModel):
+    title: str = Field(..., min_length=2, max_length=250)
+    content: str = Field(..., min_length=5)
+    image_url: Optional[str] = None
+
+
+class NewsUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=2, max_length=250)
+    content: Optional[str] = Field(None, min_length=5)
+    image_url: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
 class NewsResponse(BaseModel):
     id: int
     title: str
     content: str
     image_url: Optional[str] = None
     published_at: datetime
+    is_active: bool
 
     class Config:
         from_attributes = True
+
+
+class AdminLogin(BaseModel):
+    password: str

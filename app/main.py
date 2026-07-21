@@ -49,11 +49,6 @@ def admin_index():
     return RedirectResponse("/page/")
 
 
-@app.get("/")
-def read_root():
-    return {"message": "MarkosDev API online", "docs": "/docs"}
-
-
 @app.post("/api/contact", response_model=schemas.ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 def create_contact(
     payload: schemas.ContactMessageCreate,
@@ -89,5 +84,92 @@ def get_news(news_id: int, db: Session = Depends(get_db)):
     if not news:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notícia não encontrada")
     return news
+
+
+# ============================================
+# Painel Administrativo — CRUD de notícias
+# ============================================
+
+from fastapi import Header
+from app.config import settings
+
+
+def verify_admin(password: str = Header(alias="x-admin-password")):
+    if password != settings.admin_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Senha administrativa inválida",
+        )
+    return True
+
+
+@app.post("/api/admin/login")
+def admin_login(payload: schemas.AdminLogin):
+    if payload.password != settings.admin_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Senha inválida",
+        )
+    return {"success": True, "message": "Autenticado com sucesso"}
+
+
+@app.get("/api/admin/news", response_model=list[schemas.NewsResponse])
+def admin_list_news(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    return crud.list_all_news_admin(db, skip=skip, limit=limit)
+
+
+@app.get("/api/admin/news/{news_id}", response_model=schemas.NewsResponse)
+def admin_get_news(
+    news_id: int,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    news = crud.get_news_by_id_admin(db, news_id)
+    if not news:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notícia não encontrada")
+    return news
+
+
+@app.post(
+    "/api/admin/news",
+    response_model=schemas.NewsResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def admin_create_news(
+    payload: schemas.NewsCreate,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    return crud.create_news(db, payload)
+
+
+@app.put("/api/admin/news/{news_id}", response_model=schemas.NewsResponse)
+def admin_update_news(
+    news_id: int,
+    payload: schemas.NewsUpdate,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    news = crud.update_news(db, news_id, payload)
+    if not news:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notícia não encontrada")
+    return news
+
+
+@app.delete("/api/admin/news/{news_id}")
+def admin_delete_news(
+    news_id: int,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    deleted = crud.delete_news(db, news_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notícia não encontrada")
+    return {"success": True, "message": "Notícia excluída com sucesso"}
 
 
