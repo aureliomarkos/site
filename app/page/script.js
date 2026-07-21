@@ -149,17 +149,65 @@ document.addEventListener("DOMContentLoaded", () => {
   chatToggle.addEventListener("click", () => setChat(chatWindow.hidden))
   chatClose.addEventListener("click", () => setChat(false))
 
-  chatForm.addEventListener("submit", (e) => {
+  chatForm.addEventListener("submit", async (e) => {
     e.preventDefault()
     const text = chatInput.value.trim()
     if (!text) return
+
     messages.push({ from: "user", text })
-    messages.push({
-      from: "bot",
-      text: "Obrigado pela mensagem! Este é um protótipo — em breve responderei de verdade.",
-    })
     chatInput.value = ""
     renderMessages()
+
+    const botMessage = { from: "bot", text: "Digitando..." }
+    messages.push(botMessage)
+    renderMessages()
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      })
+
+      // Se o servidor retornou erro HTTP
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({ detail: "Erro ao conectar com o assistente." }))
+        botMessage.text = errData.detail || "Erro ao conectar com o assistente."
+        renderMessages()
+        return
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ""
+      botMessage.text = ""
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split("\n")
+        buffer = lines.pop()
+
+        for (const line of lines) {
+          if (line.startsWith("data:")) {
+            const data = line.slice(5).trim()
+            if (data === "[DONE]") break
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.content) {
+                botMessage.text += parsed.content
+                renderMessages()
+              }
+            } catch (err) { /* ignore parse errors */ }
+          }
+        }
+      }
+    } catch (err) {
+      botMessage.text = "Desculpe, ocorreu um erro ao conectar com o assistente."
+      renderMessages()
+    }
   })
 
   /* ---------- Blog ---------- */
