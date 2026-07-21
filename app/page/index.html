@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="bg-background">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarkosDev — Backend, Automação & IA</title>
+  <meta name="description"
+    content="Portfólio de MarkosDev — desenvolvedor focado em backend, automação e inteligência artificial. Apps hospedados na Oracle Cloud." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <!-- Overlay do menu mobile -->
+  <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-brand">
+      <a href="#inicio" class="brand-link" data-close-menu>
+        <span class="brand-logo">
+          <i data-lucide="terminal"></i>
+        </span>
+        <span class="brand-name">MarkosDev</span>
+      </a>
+      <button id="close-menu" class="icon-btn sidebar-close" aria-label="Fechar menu">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="nav-label">Navegação</p>
+      <ul class="nav-list">
+        <li>
+          <a href="#inicio" class="nav-item" data-close-menu>
+            <i data-lucide="home"></i> <span class="nav-text">Início</span>
+          </a>
+        </li>
+        <li>
+          <a href="#apps" class="nav-item" data-close-menu>
+            <i data-lucide="layout-grid"></i> <span class="nav-text">Meus Apps</span>
+          </a>
+        </li>
+        <li>
+          <a href="#blog" class="nav-item" data-close-menu>
+            <i data-lucide="newspaper"></i> <span class="nav-text">Blog</span>
+          </a>
+        </li>
+        <li>
+          <a href="#contato" class="nav-item" data-close-menu>
+            <i data-lucide="mail"></i> <span class="nav-text">Contato</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p class="mono-muted">v1.0.0 · Oracle Cloud</p>
+    </div>
+  </aside>
+
+  <!-- Conteúdo principal -->
+  <div class="main-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button id="open-menu" class="icon-btn header-hamburger" aria-label="Abrir menu">
+          <i data-lucide="menu"></i>
+        </button>
+        <a href="#inicio" class="brand-link">
+          <span class="brand-logo">
+            <i data-lucide="terminal"></i>
+          </span>
+          <span class="brand-name">MarkosDev</span>
+        </a>
+      </div>
+
+      <div class="header-right">
+        <!-- Searchbar -->
+        <div class="search-container">
+          <button class="search-btn-mobile hide-desktop" aria-label="Pesquisar">
+            <i data-lucide="search"></i>
+          </button>
+          <i data-lucide="search" class="search-icon hide-mobile"></i>
+          <input type="text" placeholder="Buscar..." class="search-input hide-mobile" aria-label="Buscar" />
+        </div>
+
+        <button id="theme-toggle" class="icon-btn bordered" aria-label="Alternar tema">
+          <i data-lucide="moon" id="theme-icon"></i>
+        </button>
+
+        <div class="client-menu">
+          <button id="client-toggle" class="btn bordered" aria-haspopup="menu" aria-expanded="false">
+            <i data-lucide="user-round"></i>
+            <span class="hide-mobile">Área do Cliente</span>
+            <i data-lucide="chevron-down" id="client-chevron" class="chevron"></i>
+          </button>
+          <div id="client-dropdown" class="dropdown" role="menu" hidden>
+            <button class="dropdown-item" role="menuitem">
+              <i data-lucide="log-in" class="text-secondary"></i> Login
+            </button>
+            <button class="dropdown-item bordered-top" role="menuitem">
+              <i data-lucide="user-plus" class="text-accent"></i> Cadastro
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section id="inicio" class="section hero active">
+        <div class="container">
+          <p class="pill">
+            <span class="dot"></span>
+            disponível para novos projetos
+          </p>
+
+          <h1 class="hero-title">Markos<span class="text-primary">Dev</span></h1>
+
+          <p class="hero-subtitle">
+            Desenvolvedor focado em <span class="strong">backend</span>,
+            <span class="strong">automação</span> e
+            <span class="strong">inteligência artificial</span>. Construo APIs robustas, pipelines
+            automatizados e integrações inteligentes hospedadas na nuvem.
+          </p>
+
+          <div class="highlights">
+            <div class="highlight"><i data-lucide="server"></i> Backend</div>
+            <div class="highlight"><i data-lucide="workflow"></i> Automação</div>
+            <div class="highlight"><i data-lucide="bot"></i> IA</div>
+          </div>
+
+          <div class="stack">
+            <p class="mono-label">// stack</p>
+            <div class="stack-badges">
+              <span class="badge">Python</span>
+              <span class="badge">FastAPI</span>
+              <span class="badge">HTML/CSS/JS</span>
+              <span class="badge">Docker</span>
+              <span class="badge">n8n</span>
+              <span class="badge">Oracle Cloud</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projetos -->
+      <section id="apps" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="mono-label">// projetos</p>
+            <h2 class="section-title">Meus Apps</h2>
+            <p class="section-desc">Aplicações web hospedadas na Oracle Cloud.</p>
+          </div>
+
+          <div class="apps-grid">
+            <a href="https://nexus.markosdev.com.br" class="app-card">
+              <div class="app-card-top">
+                <span class="app-icon"><i data-lucide="monitor-cloud"></i></span>
+                <i data-lucide="arrow-up-right" class="app-arrow"></i>
+              </div>
+              <h3 class="app-name">Nexus Gestão</h3>
+              <p class="app-desc">Sistema de gestão centralizada de infraestrutura.</p>
+              <div class="tags">
+                <span class="tag">Docker</span><span class="tag">FastAPI</span>
+              </div>
+            </a>
+
+            <a href="https://security.markosdev.com.br" class="app-card">
+              <div class="app-card-top">
+                <span class="app-icon"><i data-lucide="lock"></i></span>
+                <i data-lucide="arrow-up-right" class="app-arrow"></i>
+              </div>
+              <h3 class="app-name">Security Key</h3>
+              <p class="app-desc">Cofre digital familiar para gestão de senhas.
+              </p>
+              <div class="tags">
+                <span class="tag">Docker</span><span class="tag">FastAPI</span>
+              </div>
+            </a>
+
+            <a href="https://caixa.markosdev.com.br" class="app-card">
+              <div class="app-card-top">
+                <span class="app-icon"><i data-lucide="handshake"></i></span>
+                <i data-lucide="arrow-up-right" class="app-arrow"></i>
+              </div>
+              <h3 class="app-name">Meu Caixa</h3>
+              <p class="app-desc">Controle de Contas a Pagar e Receber.</p>
+              <div class="tags">
+                <span class="tag">Docker</span><span class="tag">FastAPI</span>
+              </div>
+            </a>
+
+            <div class="app-card-mobile">
+              <div class="mobile-inner">
+                <div class="mobile-info">
+                  <span class="mobile-icon"><i data-lucide="smartphone"></i></span>
+                  <div>
+                    <div class="mobile-title-row">
+                      <h3 class="app-name">App Mobile</h3>
+                      <span class="soon">em breve</span>
+                    </div>
+                    <p class="app-desc">Versão mobile das ferramentas MarkosDev. Disponível para download em breve.</p>
+                  </div>
+                </div>
+                <button class="btn-primary" disabled>
+                  <i data-lucide="download"></i> Baixar App
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Blog -->
+      <section id="blog" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="mono-label">// blog</p>
+            <h2 class="section-title">Blog</h2>
+            <p class="section-desc">Artigos sobre backend, automação e IA.</p>
+          </div>
+
+          <div class="blog-layout">
+            <!-- Coluna esquerda: notícia em destaque -->
+            <article id="blog-featured" class="blog-featured">
+              <p class="blog-empty">Selecione uma notícia ao lado para ler.</p>
+            </article>
+
+            <!-- Coluna direita: frame de notícias -->
+            <aside class="blog-sidebar">
+              <div class="blog-frame">
+                <h3 class="blog-frame-title">Notícias</h3>
+                <ol id="blog-list" class="blog-list">
+                  <!-- itens preenchidos via JS -->
+                </ol>
+                <nav class="blog-index" aria-label="Navegação de notícias">
+                  <button id="blog-prev" class="blog-index-link" type="button">Anterior</button>
+                  <button id="blog-next" class="blog-index-link" type="button">Próximo</button>
+                  <button id="blog-all" class="blog-index-link" type="button">Ver todas as notícias</button>
+                </nav>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contato -->
+      <section id="contato" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="mono-label">// contato</p>
+            <h2 class="section-title">Contato</h2>
+            <p class="section-desc">Fique à vontade para me enviar um e-mail.</p>
+          </div>
+
+          <div class="contact-card">
+            <form class="contact-form">
+              <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="subject">Assunto</label>
+                <input type="text" id="subject" name="subject" required>
+              </div>
+              <div class="form-group">
+                <label for="message">Mensagem</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+            </form>
+
+            <div class="contact-links">
+              <a href="mailto:aureliomarkos@yahoo.com" class="btn contact-btn">
+                <i data-lucide="mail"></i> aureliomarkos@yahoo.com
+              </a>
+              <a href="https://www.linkedin.com/in/marcos-aurelio-oripka/" class="btn contact-btn bordered">
+                <i data-lucide="briefcase"></i> LinkedIn
+              </a>
+              <a href="https://github.com/aureliomarkos" class="btn contact-btn bordered">
+                <i data-lucide="code-2"></i> GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-top">
+          <div>
+            <p class="footer-tagline">Backend feito com Python &amp; FastAPI.</p>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p class="mono-muted" id="copyright">© MarkosDev. Todos os direitos reservados.</p>
+          <div class="server-status">
+            <span class="status-dot"><span class="ping"></span><span class="core"></span></span>
+            <span class="mono-muted">Status do servidor: <span class="text-primary strong">Online</span></span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Chat Widget -->
+  <div class="chat-widget">
+    <div id="chat-window" class="chat-window" hidden>
+      <div class="chat-header">
+        <div class="chat-header-title">
+          <i data-lucide="bot"></i>
+          <span>IA Assistant</span>
+        </div>
+        <button id="chat-close" class="chat-header-close" aria-label="Fechar chat">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" class="chat-input" placeholder="Digite sua mensagem..." autocomplete="off" />
+        <button type="submit" class="chat-send" aria-label="Enviar mensagem">
+          <i data-lucide="send"></i>
+        </button>
+      </form>
+    </div>
+    <button id="chat-toggle" class="chat-fab" aria-label="Abrir chat">
+      <i data-lucide="message-square" id="chat-fab-icon"></i>
+    </button>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
