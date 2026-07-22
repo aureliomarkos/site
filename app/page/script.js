@@ -68,8 +68,29 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- SPA Hash-based Switching ---------- */
   const navItems = document.querySelectorAll(".nav-item")
   const sections = document.querySelectorAll(".section")
+  const searchInput = document.getElementById("search-input")
+  const searchButton = document.getElementById("search-btn")
+  const searchButtonMobile = document.getElementById("search-btn-mobile")
+  const searchEmpty = document.getElementById("search-empty")
+  let currentSearchTerm = ""
+
+  function resetSearchState() {
+    sections.forEach((section) => {
+      section.classList.remove("search-match", "search-hide")
+    })
+    if (searchEmpty) {
+      searchEmpty.hidden = true
+      searchEmpty.textContent = ""
+    }
+    if (searchInput) {
+      searchInput.value = ""
+    }
+    currentSearchTerm = ""
+  }
 
   function handleNavigation() {
+    resetSearchState()
+
     let hash = window.location.hash
     // Default to #inicio if hash is empty or doesn't match an existing section
     if (!hash || !document.querySelector(hash)) {
@@ -103,6 +124,56 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("hashchange", handleNavigation)
   // Execute navigation on initial page load
   handleNavigation()
+
+  function applySearch(query) {
+    const term = query.trim().toLowerCase()
+    const activeSectionId = document.querySelector(".section.active")?.id
+    let hasMatch = false
+
+    if (!term) {
+      resetSearchState()
+      return
+    }
+
+    sections.forEach((section) => {
+      const sectionText = section.textContent.toLowerCase()
+      const isActiveSection = section.id === activeSectionId
+      const matches = sectionText.includes(term) || isActiveSection
+
+      section.classList.toggle("search-match", matches)
+      section.classList.toggle("search-hide", !matches)
+
+      if (matches) hasMatch = true
+    })
+
+    if (searchEmpty) {
+      searchEmpty.hidden = hasMatch
+      searchEmpty.textContent = hasMatch
+        ? ""
+        : `Nenhum resultado encontrado para "${query.trim()}".`
+    }
+  }
+
+  function triggerSearch() {
+    currentSearchTerm = searchInput?.value || ""
+    applySearch(currentSearchTerm)
+  }
+
+  searchInput?.addEventListener("input", (event) => {
+    currentSearchTerm = event.target.value
+  })
+
+  searchInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      triggerSearch()
+    }
+  })
+
+  searchButton?.addEventListener("click", triggerSearch)
+  searchButtonMobile?.addEventListener("click", triggerSearch)
+
+  applySearch("")
 
   /* ---------- Rodapé: ano dinâmico ---------- */
   document.getElementById("copyright").textContent =

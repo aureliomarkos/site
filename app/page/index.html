@@ -88,11 +88,14 @@
       <div class="header-right">
         <!-- Searchbar -->
         <div class="search-container">
-          <button class="search-btn-mobile hide-desktop" aria-label="Pesquisar">
+          <button class="search-btn-mobile hide-desktop" aria-label="Pesquisar" id="search-btn-mobile">
             <i data-lucide="search"></i>
           </button>
           <i data-lucide="search" class="search-icon hide-mobile"></i>
-          <input type="text" placeholder="Buscar..." class="search-input hide-mobile" aria-label="Buscar" />
+          <input id="search-input" type="text" placeholder="Buscar..." class="search-input hide-mobile" aria-label="Buscar" />
+          <button id="search-btn" class="search-btn hide-mobile" type="button" aria-label="Pesquisar">
+            <i data-lucide="search"></i>
+          </button>
         </div>
 
         <button id="theme-toggle" class="icon-btn bordered" aria-label="Alternar tema">
@@ -118,6 +121,8 @@
     </header>
 
     <main>
+      <p id="search-empty" class="search-empty" hidden></p>
+
       <!-- Hero -->
       <section id="inicio" class="section hero active">
         <div class="container">

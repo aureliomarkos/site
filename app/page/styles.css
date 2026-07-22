@@ -395,6 +395,24 @@ main {
   color: var(--foreground);
 }
 
+.search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  width: 2.25rem;
+  margin-left: 0.35rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+.search-btn:hover {
+  background: var(--muted);
+}
+
 @media (min-width: 640px) {
   .search-input {
     width: 12rem;
@@ -424,6 +442,17 @@ main {
     color: var(--muted-foreground);
     pointer-events: none;
   }
+}
+
+.search-empty {
+  margin: 1rem auto 0;
+  max-width: 48rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
 }
 
 .client-menu {
@@ -484,6 +513,14 @@ main {
 .section.active {
   display: block;
   animation: sectionFadeIn 0.3s ease-in-out;
+}
+
+.section.search-hide {
+  display: none !important;
+}
+
+.section.search-match {
+  display: block;
 }
 
 @keyframes sectionFadeIn {
