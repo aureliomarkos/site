@@ -55,6 +55,61 @@ def list_client_messages(db: Session, client_id: int):
     )
 
 
+def list_all_client_messages_admin(db: Session):
+    rows = (
+        db.query(models.ClientMessage, models.Client.name, models.Client.email)
+        .join(models.Client, models.ClientMessage.client_id == models.Client.id)
+        .order_by(models.ClientMessage.created_at.desc())
+        .all()
+    )
+    results = []
+    for msg, client_name, client_email in rows:
+        results.append({
+            "id": msg.id,
+            "client_id": msg.client_id,
+            "client_name": client_name,
+            "client_email": client_email,
+            "title": msg.title,
+            "message": msg.message,
+            "attachment": msg.attachment,
+            "status": msg.status,
+            "created_at": msg.created_at,
+            "updated_at": msg.updated_at,
+        })
+    return results
+
+
+def admin_update_client_message(db: Session, message_id: int, message: schemas.ClientMessageUpdate):
+    db_message = (
+        db.query(models.ClientMessage)
+        .filter(models.ClientMessage.id == message_id)
+        .first()
+    )
+    if not db_message:
+        return None
+
+    update_data = message.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_message, key, value)
+    db_message.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(db_message)
+
+    client = db.query(models.Client).filter(models.Client.id == db_message.client_id).first()
+    return {
+        "id": db_message.id,
+        "client_id": db_message.client_id,
+        "client_name": client.name if client else "",
+        "client_email": client.email if client else "",
+        "title": db_message.title,
+        "message": db_message.message,
+        "attachment": db_message.attachment,
+        "status": db_message.status,
+        "created_at": db_message.created_at,
+        "updated_at": db_message.updated_at,
+    }
+
+
 def update_client_message(db: Session, client_id: int, message_id: int, message: schemas.ClientMessageUpdate):
     db_message = (
         db.query(models.ClientMessage)

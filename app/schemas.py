@@ -75,6 +75,19 @@ class ClientMessageResponse(BaseModel):
         from_attributes = True
 
 
+class AdminClientMessageResponse(BaseModel):
+    id: int
+    client_id: int
+    client_name: str
+    client_email: str
+    title: str
+    message: str
+    attachment: Optional[str] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+
 class NewsCreate(BaseModel):
     title: str = Field(..., min_length=2, max_length=250)
     content: str = Field(..., min_length=5)

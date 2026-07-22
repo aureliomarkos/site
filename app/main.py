@@ -237,6 +237,30 @@ def admin_delete_news(
     return {"success": True, "message": "Notícia excluída com sucesso"}
 
 
+@app.get("/api/admin/client-messages", response_model=list[schemas.AdminClientMessageResponse])
+def admin_list_client_messages(
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    return crud.list_all_client_messages_admin(db)
+
+
+@app.put(
+    "/api/admin/client-messages/{message_id}",
+    response_model=schemas.AdminClientMessageResponse,
+)
+def admin_update_client_message(
+    message_id: int,
+    payload: schemas.ClientMessageUpdate,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_admin),
+):
+    updated = crud.admin_update_client_message(db, message_id, payload)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Mensagem não encontrada")
+    return updated
+
+
 # ============================================
 # Chat IA (OpenRouter)
 # ============================================

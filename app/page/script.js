@@ -158,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const clientMessageTitle = document.getElementById("client-message-title")
   const clientMessageContent = document.getElementById("client-message-content")
   const clientMessageAttachment = document.getElementById("client-message-attachment")
-  const clientMessageStatus = document.getElementById("client-message-status")
   const clientMessageSave = document.getElementById("client-message-save")
 
   let clientAuth = null
@@ -252,7 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clientMessageTitle.value = message?.title || ""
     clientMessageContent.value = message?.message || ""
     clientMessageAttachment.value = message?.attachment || ""
-    clientMessageStatus.value = message?.status || "pendente"
     clientMessageModal.hidden = false
     clientMessageTitle.focus()
   }
@@ -277,14 +275,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   clientMessageForm?.addEventListener("submit", async (e) => {
     e.preventDefault()
+    const messageId = clientMessageId.value
+    const existingMessage = messageId ? clientMessages.find((m) => m.id === Number(messageId)) : null
     const payload = {
       title: clientMessageTitle.value.trim(),
       message: clientMessageContent.value.trim(),
       attachment: clientMessageAttachment.value.trim() || null,
-      status: clientMessageStatus.value,
+      status: existingMessage?.status || "pendente",
     }
-
-    const messageId = clientMessageId.value
     try {
       const response = await fetch(`/api/clients/${clientAuth.id}/messages${messageId ? `/${messageId}` : ""}`, {
         method: messageId ? "PUT" : "POST",
@@ -388,21 +386,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let hash = window.location.hash
     // Default to #inicio if hash is empty or doesn't match an existing section
-    if (!hash || !document.querySelector(hash)) {
+    // But allow admin submenu hashes (#admin-noticias, #admin-mensagens)
+    const isAdminSubHash = hash === "#admin-noticias" || hash === "#admin-mensagens"
+    if (!hash || (!document.querySelector(hash) && !isAdminSubHash)) {
       hash = "#inicio"
     }
 
     // Toggle active classes on sections
     sections.forEach((section) => {
-      if (`#${section.id}` === hash) {
+      if (`#${section.id}` === hash || (isAdminSubHash && section.id === "admin")) {
         section.classList.add("active")
       } else {
         section.classList.remove("active")
       }
     })
 
-    // Toggle active classes on nav sidebar items
+    // Handle admin submenu hashes
+    if (hash === "#admin-noticias" || hash === "#admin-mensagens") {
+      // Show admin section
+      const adminSection = document.getElementById("admin")
+      if (adminSection) {
+        adminSection.classList.add("active")
+      }
+
+      // Show admin submenu if logged in (check localStorage)
+      const storedAdminToken = localStorage.getItem("markosdev_admin_token")
+      if (storedAdminToken) {
+        const adminSubmenu = document.getElementById("admin-submenu")
+        const adminChevron = document.getElementById("admin-submenu-chevron")
+        if (adminSubmenu) {
+          adminSubmenu.hidden = false
+          adminSubmenu.classList.add("show")
+          if (adminChevron) adminChevron.classList.add("rotate")
+        }
+
+        // Switch to the appropriate panel
+        const panelNoticias = document.getElementById("admin-panel-noticias")
+        const panelMensagens = document.getElementById("admin-panel-mensagens")
+        if (hash === "#admin-noticias") {
+          panelNoticias.hidden = false
+          panelMensagens.hidden = true
+        } else if (hash === "#admin-mensagens") {
+          panelNoticias.hidden = true
+          panelMensagens.hidden = false
+        }
+      }
+    }
+
+    // Toggle active classes on nav sidebar items (including admin parent)
     navItems.forEach((item) => {
+      const href = item.getAttribute("href")
+      // For admin, match both #admin and admin submenu hashes
+      if (href === hash || (href === "#admin" && (hash === "#admin-noticias" || hash === "#admin-mensagens"))) {
+        item.classList.add("active")
+      } else {
+        item.classList.remove("active")
+      }
+    })
+
+    // Toggle active classes on submenu items
+    const submenuItems = document.querySelectorAll(".submenu-item")
+    submenuItems.forEach((item) => {
       const href = item.getAttribute("href")
       if (href === hash) {
         item.classList.add("active")
@@ -863,7 +907,75 @@ document.addEventListener("DOMContentLoaded", () => {
     loginSection.hidden = true
     dashboardSection.hidden = false
     loadNews()
+    loadAdminClientMessages()
+
+    // Mostrar submenu na sidebar
+    const adminSubmenu = document.getElementById("admin-submenu")
+    const adminChevron = document.getElementById("admin-submenu-chevron")
+    if (adminSubmenu) {
+      adminSubmenu.hidden = false
+      adminSubmenu.classList.add("show")
+      if (adminChevron) adminChevron.classList.add("rotate")
+    }
+
+    // Mostrar painel de notícias por padrão
+    const panelNoticias = document.getElementById("admin-panel-noticias")
+    const panelMensagens = document.getElementById("admin-panel-mensagens")
+    if (panelNoticias) panelNoticias.hidden = false
+    if (panelMensagens) panelMensagens.hidden = true
   }
+
+  /* ---------- Gerenciar Submenu Admin ---------- */
+  const adminSubmenu = document.getElementById("admin-submenu")
+  const adminChevron = document.getElementById("admin-submenu-chevron")
+  const adminSubmenuItems = document.querySelectorAll(".submenu-item")
+  const panelNoticias = document.getElementById("admin-panel-noticias")
+  const panelMensagens = document.getElementById("admin-panel-mensagens")
+
+  // Toggle do submenu ao clicar no item Admin
+  const adminNavItem = document.querySelector('a[href="#admin"].nav-item')
+  adminNavItem?.addEventListener("click", (e) => {
+    e.preventDefault()
+    if (!adminToken) return // Não mostrar se não logado
+
+    const isOpen = adminSubmenu.classList.contains("show")
+    adminSubmenu.classList.toggle("show", !isOpen)
+    adminSubmenu.hidden = isOpen
+    adminChevron?.classList.toggle("rotate", !isOpen)
+  })
+
+  // Função para trocar entre os painéis
+  function switchAdminPanel(panel) {
+    panelNoticias.hidden = panel !== "noticias"
+    panelMensagens.hidden = panel !== "mensagens"
+
+    // Atualizar active state nos itens do submenu
+    adminSubmenuItems.forEach((item) => {
+      const href = item.getAttribute("href")
+      item.classList.toggle("active", href === `#${panel}`)
+    })
+  }
+
+  // Event listeners para os itens do submenu
+  adminSubmenuItems.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      const href = item.getAttribute("href")
+      if (href === "#admin-noticias") {
+        switchAdminPanel("noticias")
+      } else if (href === "#admin-mensagens") {
+        switchAdminPanel("mensagens")
+      }
+    })
+  })
+
+  // Fechar submenu do Admin quando o mouse sai da sidebar (desktop)
+  sidebar.addEventListener("mouseleave", () => {
+    if (window.innerWidth >= 1024 && adminSubmenu.classList.contains("show")) {
+      adminSubmenu.classList.remove("show")
+      adminSubmenu.hidden = true
+      adminChevron?.classList.remove("rotate")
+    }
+  })
 
   // Carregar notícias
   async function loadNews() {
@@ -877,6 +989,116 @@ document.addEventListener("DOMContentLoaded", () => {
       newsList.innerHTML = `<p class="admin-empty">Erro ao carregar notícias.</p>`
     }
   }
+
+  /* ---------- Mensagens dos Clientes (Admin) ---------- */
+  const messagesList = document.getElementById("admin-messages-list")
+  const msgDetailModal = document.getElementById("admin-msg-detail-modal")
+  const msgDetailClose = document.getElementById("admin-msg-detail-close")
+  const msgDetailCancel = document.getElementById("admin-msg-detail-cancel")
+  const msgDetailTitle = document.getElementById("admin-msg-detail-title")
+  const msgDetailClient = document.getElementById("admin-msg-detail-client")
+  const msgDetailDate = document.getElementById("admin-msg-detail-date")
+  const msgDetailStatus = document.getElementById("admin-msg-detail-status")
+  const msgDetailBody = document.getElementById("admin-msg-detail-body")
+  const msgDetailId = document.getElementById("admin-msg-detail-id")
+
+  let adminClientMessages = []
+
+  function formatAdminDateTime(iso) {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return iso
+    return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(d)
+  }
+
+  async function loadAdminClientMessages() {
+    try {
+      const res = await fetch("/api/admin/client-messages", { headers: getHeaders() })
+      if (!res.ok) throw new Error("Falha ao carregar")
+      adminClientMessages = await res.json()
+      renderAdminClientMessages(adminClientMessages)
+    } catch (err) {
+      messagesList.innerHTML = `<p class="admin-empty">Erro ao carregar mensagens.</p>`
+    }
+  }
+
+  function renderAdminClientMessages(items) {
+    if (!items.length) {
+      messagesList.innerHTML = `<p class="admin-empty">Nenhuma mensagem de cliente.</p>`
+      return
+    }
+
+    messagesList.innerHTML = ""
+    items.forEach((item) => {
+      const card = document.createElement("div")
+      card.className = "admin-msg-card"
+      card.dataset.id = item.id
+
+      const statusClass = (item.status || "pendente").toLowerCase().replace(/\s+/g, "-")
+      const statusLabel = item.status || "pendente"
+
+      card.innerHTML = `
+        <div class="admin-msg-header">
+          <span class="admin-msg-title">${item.title}</span>
+          <span class="admin-msg-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="admin-msg-meta">
+          <span>${item.client_name}</span>
+          <span>·</span>
+          <span>${item.client_email}</span>
+          <span>·</span>
+          <span>${formatAdminDateTime(item.created_at)}</span>
+        </div>
+        <p class="admin-msg-preview">${item.message}</p>
+      `
+
+      card.addEventListener("click", () => openMsgDetail(item))
+      messagesList.appendChild(card)
+    })
+  }
+
+  function openMsgDetail(item) {
+    msgDetailId.value = item.id
+    msgDetailTitle.textContent = item.title
+    msgDetailClient.textContent = `${item.client_name} — ${item.client_email}`
+    msgDetailDate.textContent = formatAdminDateTime(item.created_at)
+    msgDetailBody.textContent = item.message
+
+    const statusClass = (item.status || "pendente").toLowerCase().replace(/\s+/g, "-")
+    msgDetailStatus.textContent = item.status || "pendente"
+    msgDetailStatus.className = `admin-msg-detail-status admin-msg-status ${statusClass}`
+
+    msgDetailModal.hidden = false
+  }
+
+  function closeMsgDetail() {
+    msgDetailModal.hidden = true
+  }
+
+  msgDetailClose?.addEventListener("click", closeMsgDetail)
+  msgDetailCancel?.addEventListener("click", closeMsgDetail)
+  msgDetailModal?.addEventListener("click", (e) => {
+    if (e.target === msgDetailModal) closeMsgDetail()
+  })
+
+  // Alterar status da mensagem
+  document.querySelectorAll("[data-admin-msg-status]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = Number(msgDetailId.value)
+      const newStatus = btn.dataset.adminMsgStatus
+      try {
+        const res = await fetch(`/api/admin/client-messages/${id}`, {
+          method: "PUT",
+          headers: getHeaders(),
+          body: JSON.stringify({ status: newStatus }),
+        })
+        if (!res.ok) throw new Error("Erro ao atualizar")
+        closeMsgDetail()
+        await loadAdminClientMessages()
+      } catch (err) {
+        alert("Erro ao atualizar status da mensagem.")
+      }
+    })
+  })
 
   function renderNewsList(news) {
     if (news.length === 0) {

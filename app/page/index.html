@@ -56,10 +56,23 @@
             <i data-lucide="mail"></i> <span class="nav-text">Contato</span>
           </a>
         </li>
-        <li>
+        <li class="nav-item-with-submenu">
           <a href="#admin" class="nav-item" data-close-menu>
             <i data-lucide="shield"></i> <span class="nav-text">Admin</span>
+            <i data-lucide="chevron-down" class="submenu-chevron" id="admin-submenu-chevron"></i>
           </a>
+          <ul class="submenu" id="admin-submenu" hidden>
+            <li>
+              <a href="#admin-noticias" class="submenu-item" data-close-menu>
+                <i data-lucide="newspaper"></i>Notícias
+              </a>
+            </li>
+            <li>
+              <a href="#admin-mensagens" class="submenu-item" data-close-menu>
+                <i data-lucide="mail"></i>Mensagens
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
@@ -358,7 +371,7 @@
           <div class="section-head">
             <p class="mono-label">// administrativo</p>
             <h2 class="section-title">Painel Administrativo</h2>
-            <p class="section-desc">Gerencie as notícias do blog.</p>
+            <p class="section-desc">Gerencie o conteúdo do site.</p>
           </div>
 
           <!-- Login -->
@@ -377,15 +390,24 @@
 
           <!-- Dashboard (oculto até login) -->
           <div id="admin-dashboard" class="admin-card" hidden>
-            <div class="admin-toolbar">
-              <h3 class="admin-toolbar-title">Notícias</h3>
-              <button id="admin-new-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
-                <i data-lucide="plus"></i> Nova Notícia
-              </button>
+
+            <!-- Sub-seção: Notícias -->
+            <div id="admin-panel-noticias" class="admin-panel">
+              <div class="admin-toolbar">
+                <h3 class="admin-toolbar-title"><i data-lucide="newspaper"></i> Notícias</h3>
+                <button id="admin-new-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
+                  <i data-lucide="plus"></i> Nova Notícia
+                </button>
+              </div>
+              <div id="admin-news-list" class="admin-news-list"></div>
             </div>
 
-            <div id="admin-news-list" class="admin-news-list">
-              <!-- preenchido via JS -->
+            <!-- Sub-seção: Mensagens dos Clientes -->
+            <div id="admin-panel-mensagens" class="admin-panel" hidden>
+              <div class="admin-toolbar">
+                <h3 class="admin-toolbar-title"><i data-lucide="mail"></i> Mensagens dos Clientes</h3>
+              </div>
+              <div id="admin-messages-list" class="admin-messages-list"></div>
             </div>
           </div>
         </div>
@@ -500,14 +522,6 @@
           <label for="client-message-attachment">Arquivo Anexado</label>
           <input type="text" id="client-message-attachment" placeholder="https://..." />
         </div>
-        <div class="form-group">
-          <label for="client-message-status">Status</label>
-          <select id="client-message-status">
-            <option value="pendente">Pendente</option>
-            <option value="respondido">Respondido</option>
-            <option value="em andamento">Em andamento</option>
-          </select>
-        </div>
         <div class="modal-actions">
           <button type="button" id="client-message-modal-cancel" class="btn bordered">Cancelar</button>
           <button type="submit" id="client-message-save" class="btn btn-primary" style="width:auto;opacity:1">
@@ -554,6 +568,55 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal Detalhe Mensagem (Admin) -->
+  <div id="admin-msg-detail-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Detalhe da Mensagem</h3>
+        <button id="admin-msg-detail-close" class="icon-btn" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-form">
+        <input type="hidden" id="admin-msg-detail-id" />
+        <div class="form-group">
+          <label>Título</label>
+          <div class="detail-field" id="admin-msg-detail-title"></div>
+        </div>
+        <div class="form-group">
+          <label>Cliente</label>
+          <div class="detail-field" id="admin-msg-detail-client"></div>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <div class="detail-field" id="admin-msg-detail-date"></div>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <div class="detail-field"><span id="admin-msg-detail-status" class="admin-msg-detail-status admin-msg-status pendente">pendente</span></div>
+        </div>
+        <div class="form-group">
+          <label>Mensagem</label>
+          <div class="detail-field detail-field-scroll" id="admin-msg-detail-body"></div>
+        </div>
+        <div class="admin-msg-detail-actions">
+          <button data-admin-msg-status="pendente" class="btn bordered" style="width:auto;opacity:1">
+            <i data-lucide="clock"></i> Pendente
+          </button>
+          <button data-admin-msg-status="em andamento" class="btn bordered" style="width:auto;opacity:1">
+            <i data-lucide="loader"></i> Em andamento
+          </button>
+          <button data-admin-msg-status="resolvido" class="btn btn-primary" style="width:auto;opacity:1">
+            <i data-lucide="check-circle"></i> Resolvido
+          </button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="admin-msg-detail-cancel" class="btn bordered">Fechar</button>
+        </div>
+      </div>
     </div>
   </div>
 
