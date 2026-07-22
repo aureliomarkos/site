@@ -52,6 +52,23 @@ def admin_index():
     return RedirectResponse("/page/")
 
 
+@app.post("/api/clients", response_model=schemas.ClientResponse, status_code=status.HTTP_201_CREATED)
+def create_client(
+    payload: schemas.ClientCreate,
+    db: Session = Depends(get_db),
+):
+    try:
+        return crud.create_client(db, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except Exception as exc:
+        crud.logger.exception("Unexpected client registration error: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="servidor fora do ar",
+        ) from exc
+
+
 @app.post("/api/contact", response_model=schemas.ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 def create_contact(
     payload: schemas.ContactMessageCreate,

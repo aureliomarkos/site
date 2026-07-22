@@ -109,10 +109,10 @@
             <i data-lucide="chevron-down" id="client-chevron" class="chevron"></i>
           </button>
           <div id="client-dropdown" class="dropdown" role="menu" hidden>
-            <button class="dropdown-item" role="menuitem">
+            <button class="dropdown-item" role="menuitem" id="client-login-btn">
               <i data-lucide="log-in" class="text-secondary"></i> Login
             </button>
-            <button class="dropdown-item bordered-top" role="menuitem">
+            <button class="dropdown-item bordered-top" role="menuitem" id="client-register-btn">
               <i data-lucide="user-plus" class="text-accent"></i> Cadastro
             </button>
           </div>
@@ -388,6 +388,47 @@
     <button id="chat-toggle" class="chat-fab" aria-label="Abrir chat">
       <i data-lucide="message-square" id="chat-fab-icon"></i>
     </button>
+  </div>
+
+  <!-- Modal Cadastro Cliente -->
+  <div id="client-register-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Cadastrar novo cliente</h3>
+        <button id="client-register-close" class="icon-btn" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="client-register-form" class="modal-form">
+        <div class="form-group">
+          <label for="client-register-name">Nome</label>
+          <input type="text" id="client-register-name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="client-register-email">E-mail</label>
+          <input type="email" id="client-register-email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="client-register-phone">Telefone</label>
+          <input type="text" id="client-register-phone" name="phone" placeholder="(11) 99999-9999" />
+        </div>
+        <div class="form-group">
+          <label for="client-register-password">Senha</label>
+          <input type="password" id="client-register-password" name="password" required />
+        </div>
+        <div class="form-group">
+          <label for="client-register-company">Empresa</label>
+          <input type="text" id="client-register-company" name="company" placeholder="Opcional" />
+        </div>
+        <p id="client-register-message" class="admin-error" hidden></p>
+        <div class="modal-actions">
+          <button type="button" id="client-register-cancel" class="btn bordered">Cancelar</button>
+          <button type="submit" class="btn btn-primary" style="width:auto;opacity:1">
+            <i data-lucide="user-plus"></i> Cadastrar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Modal Admin -->

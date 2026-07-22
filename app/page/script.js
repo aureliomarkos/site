@@ -48,6 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const clientToggle = document.getElementById("client-toggle")
   const clientDropdown = document.getElementById("client-dropdown")
   const clientChevron = document.getElementById("client-chevron")
+  const clientRegisterBtn = document.getElementById("client-register-btn")
+  const clientRegisterModal = document.getElementById("client-register-modal")
+  const clientRegisterClose = document.getElementById("client-register-close")
+  const clientRegisterCancel = document.getElementById("client-register-cancel")
+  const clientRegisterForm = document.getElementById("client-register-form")
+  const clientRegisterMessage = document.getElementById("client-register-message")
 
   function setClientMenu(open) {
     clientDropdown.hidden = !open
@@ -59,6 +65,59 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation()
     setClientMenu(clientDropdown.hidden)
   })
+
+  function openClientRegisterModal() {
+    setClientMenu(false)
+    clientRegisterModal.hidden = false
+    clientRegisterMessage.hidden = true
+    clientRegisterMessage.textContent = ""
+    clientRegisterForm.reset()
+    document.getElementById("client-register-name")?.focus()
+  }
+
+  function closeClientRegisterModal() {
+    clientRegisterModal.hidden = true
+  }
+
+  clientRegisterBtn?.addEventListener("click", (e) => {
+    e.stopPropagation()
+    openClientRegisterModal()
+  })
+  clientRegisterClose?.addEventListener("click", closeClientRegisterModal)
+  clientRegisterCancel?.addEventListener("click", closeClientRegisterModal)
+  clientRegisterModal?.addEventListener("click", (e) => {
+    if (e.target === clientRegisterModal) closeClientRegisterModal()
+  })
+
+  clientRegisterForm?.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const formData = new FormData(clientRegisterForm)
+    const payload = Object.fromEntries(formData.entries())
+
+    try {
+      const response = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: "servidor fora do ar" }))
+        throw new Error(errorData.detail || "servidor fora do ar")
+      }
+
+      clientRegisterForm.reset()
+      closeClientRegisterModal()
+      requestAnimationFrame(() => {
+        window.setTimeout(() => {
+          alert("Cadastro efetuado com sucesso!")
+        }, 50)
+      })
+    } catch (error) {
+      alert(error.message || "servidor fora do ar")
+    }
+  })
+
   document.addEventListener("click", (e) => {
     if (!clientDropdown.contains(e.target) && !clientToggle.contains(e.target)) {
       setClientMenu(false)

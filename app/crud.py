@@ -1,6 +1,33 @@
+import logging
+from pathlib import Path
+
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+
+LOG_PATH = Path(__file__).resolve().parent.parent / "logs" / "client_registration.log"
+LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+logger = logging.getLogger("client_registration")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.FileHandler(LOG_PATH)
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logger.addHandler(handler)
+
+
+def create_client(db: Session, client: schemas.ClientCreate) -> models.Client:
+    existing = db.query(models.Client).filter(models.Client.email == client.email).first()
+    if existing:
+        logger.warning("Duplicate email registration attempted: %s", client.email)
+        raise ValueError("email já existe")
+
+    db_client = models.Client(**client.model_dump())
+    db.add(db_client)
+    db.commit()
+    db.refresh(db_client)
+    logger.info("Client registered successfully: %s", db_client.email)
+    return db_client
 
 
 def create_contact_message(db: Session, message: schemas.ContactMessageCreate) -> models.ContactMessage:

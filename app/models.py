@@ -15,6 +15,18 @@ class ContactMessage(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+class Client(Base):
+    __tablename__ = "clients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(120), nullable=False)
+    email = Column(String(120), unique=True, index=True, nullable=False)
+    phone = Column(String(30), nullable=True)
+    password = Column(String(255), nullable=False)
+    company = Column(String(120), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class News(Base):
     __tablename__ = "news"
 
