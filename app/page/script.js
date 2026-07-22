@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clientToggle = document.getElementById("client-toggle")
   const clientDropdown = document.getElementById("client-dropdown")
   const clientChevron = document.getElementById("client-chevron")
+  const clientLoginBtnDropdown = document.getElementById("client-login-btn")
   const clientRegisterBtn = document.getElementById("client-register-btn")
   const clientRegisterModal = document.getElementById("client-register-modal")
   const clientRegisterClose = document.getElementById("client-register-close")
@@ -78,6 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeClientRegisterModal() {
     clientRegisterModal.hidden = true
   }
+
+  clientLoginBtnDropdown?.addEventListener("click", (e) => {
+    e.stopPropagation()
+    setClientMenu(false)
+    setClientAreaLoggedIn(false)
+    if (window.location.hash !== "#cliente") {
+      window.location.hash = "#cliente"
+    } else {
+      handleNavigation()
+    }
+    document.getElementById("cliente")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    clientEmailInput?.focus()
+  })
 
   clientRegisterBtn?.addEventListener("click", (e) => {
     e.stopPropagation()
@@ -123,6 +137,219 @@ document.addEventListener("DOMContentLoaded", () => {
       setClientMenu(false)
     }
   })
+
+  /* ---------- Área do Cliente ---------- */
+  const clientLoginSection = document.getElementById("client-area-login")
+  const clientDashboardSection = document.getElementById("client-area-dashboard")
+  const clientEmailInput = document.getElementById("client-email")
+  const clientPasswordInput = document.getElementById("client-password")
+  const clientLoginSubmitBtn = document.getElementById("client-login-submit-btn")
+  const clientLoginError = document.getElementById("client-login-error")
+  const clientMessagesList = document.getElementById("client-messages-list")
+  const clientWelcomeText = document.getElementById("client-welcome-text")
+  const clientNewBtn = document.getElementById("client-new-btn")
+  const clientLogoutBtn = document.getElementById("client-logout-btn")
+  const clientMessageModal = document.getElementById("client-message-modal")
+  const clientMessageModalClose = document.getElementById("client-message-modal-close")
+  const clientMessageModalCancel = document.getElementById("client-message-modal-cancel")
+  const clientMessageForm = document.getElementById("client-message-form")
+  const clientMessageModalTitle = document.getElementById("client-message-modal-title")
+  const clientMessageId = document.getElementById("client-message-id")
+  const clientMessageTitle = document.getElementById("client-message-title")
+  const clientMessageContent = document.getElementById("client-message-content")
+  const clientMessageAttachment = document.getElementById("client-message-attachment")
+  const clientMessageStatus = document.getElementById("client-message-status")
+  const clientMessageSave = document.getElementById("client-message-save")
+
+  let clientAuth = null
+  let clientMessages = []
+
+  function setClientAreaLoggedIn(loggedIn) {
+    clientLoginSection.hidden = loggedIn
+    clientDashboardSection.hidden = !loggedIn
+    if (loggedIn && clientAuth) {
+      clientWelcomeText.textContent = `Olá, ${clientAuth.name}! Aqui estão suas mensagens.`
+    }
+    if (!loggedIn) {
+      clientLoginError.hidden = true
+      clientLoginError.textContent = ""
+      clientEmailInput.value = ""
+      clientPasswordInput.value = ""
+      clientMessagesList.innerHTML = ""
+      clientWelcomeText.textContent = ""
+      clientAuth = null
+      clientMessages = []
+      localStorage.removeItem("markosdev_client_auth")
+    }
+  }
+
+  function formatClientMessageDateTime(iso) {
+    const date = new Date(iso)
+    if (Number.isNaN(date.getTime())) return iso
+    return new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date)
+  }
+
+  function renderClientMessages(items) {
+    if (!items.length) {
+      clientMessagesList.innerHTML = '<p class="admin-empty">Nenhuma mensagem cadastrada.</p>'
+      return
+    }
+
+    clientMessagesList.innerHTML = ""
+    const list = document.createElement("div")
+    list.className = "client-message-list"
+
+    items.forEach((item) => {
+      const card = document.createElement("article")
+      card.className = "client-message-card"
+      card.innerHTML = `
+        <div class="client-message-main">
+          <h4 class="client-message-title">${item.title}</h4>
+          <p class="client-message-meta">${formatClientMessageDateTime(item.created_at)} · ${item.status || "pendente"}</p>
+        </div>
+        <div class="client-message-actions">
+          <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Editar"><i data-lucide="pencil"></i></button>
+          <button class="icon-btn delete-btn" data-id="${item.id}" aria-label="Excluir"><i data-lucide="trash-2"></i></button>
+        </div>
+      `
+      list.appendChild(card)
+    })
+
+    clientMessagesList.appendChild(list)
+    if (typeof lucide !== "undefined") lucide.createIcons()
+
+    clientMessagesList.querySelectorAll(".edit-btn").forEach((btn) => {
+      btn.addEventListener("click", () => openClientMessageModal(Number(btn.dataset.id)))
+    })
+    clientMessagesList.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", () => deleteClientMessage(Number(btn.dataset.id)))
+    })
+  }
+
+  async function loadClientMessages() {
+    if (!clientAuth) return
+    try {
+      const response = await fetch(`/api/clients/${clientAuth.id}/messages`)
+      if (!response.ok) throw new Error("Erro ao carregar mensagens")
+      clientMessages = await response.json()
+      renderClientMessages(clientMessages)
+    } catch (error) {
+      clientMessagesList.innerHTML = '<p class="admin-empty">Não foi possível carregar suas mensagens.</p>'
+    }
+  }
+
+  function closeClientMessageModal() {
+    clientMessageModal.hidden = true
+  }
+
+  function openClientMessageModal(messageId = null) {
+    clientMessageModalTitle.textContent = messageId ? "Editar Mensagem" : "Nova Mensagem"
+    clientMessageId.value = messageId || ""
+    const message = clientMessages.find((item) => item.id === messageId) || null
+    clientMessageTitle.value = message?.title || ""
+    clientMessageContent.value = message?.message || ""
+    clientMessageAttachment.value = message?.attachment || ""
+    clientMessageStatus.value = message?.status || "pendente"
+    clientMessageModal.hidden = false
+    clientMessageTitle.focus()
+  }
+
+  async function deleteClientMessage(messageId) {
+    if (!confirm("Tem certeza que deseja excluir esta mensagem?")) return
+    try {
+      const response = await fetch(`/api/clients/${clientAuth.id}/messages/${messageId}`, { method: "DELETE" })
+      if (!response.ok) throw new Error("Erro ao excluir mensagem")
+      await loadClientMessages()
+    } catch (error) {
+      alert("Não foi possível excluir a mensagem.")
+    }
+  }
+
+  clientNewBtn?.addEventListener("click", () => openClientMessageModal())
+  clientMessageModalClose?.addEventListener("click", closeClientMessageModal)
+  clientMessageModalCancel?.addEventListener("click", closeClientMessageModal)
+  clientMessageModal?.addEventListener("click", (e) => {
+    if (e.target === clientMessageModal) closeClientMessageModal()
+  })
+
+  clientMessageForm?.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const payload = {
+      title: clientMessageTitle.value.trim(),
+      message: clientMessageContent.value.trim(),
+      attachment: clientMessageAttachment.value.trim() || null,
+      status: clientMessageStatus.value,
+    }
+
+    const messageId = clientMessageId.value
+    try {
+      const response = await fetch(`/api/clients/${clientAuth.id}/messages${messageId ? `/${messageId}` : ""}`, {
+        method: messageId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) throw new Error("Erro ao salvar mensagem")
+      clientMessageForm.reset()
+      closeClientMessageModal()
+      await loadClientMessages()
+    } catch (error) {
+      alert("Não foi possível salvar a mensagem.")
+    }
+  })
+
+  clientLoginSubmitBtn?.addEventListener("click", async () => {
+    const email = clientEmailInput.value.trim()
+    const password = clientPasswordInput.value.trim()
+    if (!email || !password) {
+      clientLoginError.textContent = "Preencha e-mail e senha."
+      clientLoginError.hidden = false
+      return
+    }
+
+    try {
+      const response = await fetch("/api/clients/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: "credenciais inválidas" }))
+        throw new Error(errorData.detail || "credenciais inválidas")
+      }
+      clientAuth = await response.json()
+      localStorage.setItem("markosdev_client_auth", JSON.stringify(clientAuth))
+      setClientAreaLoggedIn(true)
+      await loadClientMessages()
+    } catch (error) {
+      clientLoginError.textContent = error.message || "Não foi possível fazer login."
+      clientLoginError.hidden = false
+    }
+  })
+
+  clientPasswordInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") clientLoginSubmitBtn.click()
+  })
+
+  clientLogoutBtn?.addEventListener("click", () => {
+    setClientAreaLoggedIn(false)
+  })
+
+  const storedClientAuth = localStorage.getItem("markosdev_client_auth")
+  if (storedClientAuth) {
+    try {
+      clientAuth = JSON.parse(storedClientAuth)
+      setClientAreaLoggedIn(true)
+      loadClientMessages()
+    } catch {
+      localStorage.removeItem("markosdev_client_auth")
+      setClientAreaLoggedIn(false)
+    }
+  } else {
+    setClientAreaLoggedIn(false)
+  }
 
   /* ---------- SPA Hash-based Switching ---------- */
   const navItems = document.querySelectorAll(".nav-item")

@@ -42,6 +42,39 @@ class ClientResponse(BaseModel):
         from_attributes = True
 
 
+class ClientLogin(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=4)
+
+
+class ClientMessageCreate(BaseModel):
+    title: str = Field(..., min_length=2, max_length=250)
+    message: str = Field(..., min_length=5)
+    attachment: Optional[str] = None
+    status: Optional[str] = "pendente"
+
+
+class ClientMessageUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=2, max_length=250)
+    message: Optional[str] = Field(None, min_length=5)
+    attachment: Optional[str] = None
+    status: Optional[str] = None
+
+
+class ClientMessageResponse(BaseModel):
+    id: int
+    client_id: int
+    title: str
+    message: str
+    attachment: Optional[str] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class NewsCreate(BaseModel):
     title: str = Field(..., min_length=2, max_length=250)
     content: str = Field(..., min_length=5)

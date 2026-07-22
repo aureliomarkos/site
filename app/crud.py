@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from pathlib import Path
 
 from sqlalchemy.orm import Session
@@ -28,6 +29,61 @@ def create_client(db: Session, client: schemas.ClientCreate) -> models.Client:
     db.refresh(db_client)
     logger.info("Client registered successfully: %s", db_client.email)
     return db_client
+
+
+def authenticate_client(db: Session, payload: schemas.ClientLogin):
+    client = db.query(models.Client).filter(models.Client.email == payload.email).first()
+    if not client or client.password != payload.password:
+        raise ValueError("credenciais inválidas")
+    return client
+
+
+def create_client_message(db: Session, client_id: int, message: schemas.ClientMessageCreate) -> models.ClientMessage:
+    db_message = models.ClientMessage(client_id=client_id, **message.model_dump())
+    db.add(db_message)
+    db.commit()
+    db.refresh(db_message)
+    return db_message
+
+
+def list_client_messages(db: Session, client_id: int):
+    return (
+        db.query(models.ClientMessage)
+        .filter(models.ClientMessage.client_id == client_id)
+        .order_by(models.ClientMessage.created_at.desc())
+        .all()
+    )
+
+
+def update_client_message(db: Session, client_id: int, message_id: int, message: schemas.ClientMessageUpdate):
+    db_message = (
+        db.query(models.ClientMessage)
+        .filter(models.ClientMessage.id == message_id, models.ClientMessage.client_id == client_id)
+        .first()
+    )
+    if not db_message:
+        return None
+
+    update_data = message.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_message, key, value)
+    db_message.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(db_message)
+    return db_message
+
+
+def delete_client_message(db: Session, client_id: int, message_id: int) -> bool:
+    db_message = (
+        db.query(models.ClientMessage)
+        .filter(models.ClientMessage.id == message_id, models.ClientMessage.client_id == client_id)
+        .first()
+    )
+    if not db_message:
+        return False
+    db.delete(db_message)
+    db.commit()
+    return True
 
 
 def create_contact_message(db: Session, message: schemas.ContactMessageCreate) -> models.ContactMessage:

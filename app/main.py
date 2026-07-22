@@ -69,6 +69,50 @@ def create_client(
         ) from exc
 
 
+@app.post("/api/clients/login", response_model=schemas.ClientResponse)
+def login_client(payload: schemas.ClientLogin, db: Session = Depends(get_db)):
+    try:
+        client = crud.authenticate_client(db, payload)
+        return client
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
+
+
+@app.post("/api/clients/{client_id}/messages", response_model=schemas.ClientMessageResponse, status_code=status.HTTP_201_CREATED)
+def create_client_message(
+    client_id: int,
+    payload: schemas.ClientMessageCreate,
+    db: Session = Depends(get_db),
+):
+    return crud.create_client_message(db, client_id, payload)
+
+
+@app.get("/api/clients/{client_id}/messages", response_model=list[schemas.ClientMessageResponse])
+def list_client_messages(client_id: int, db: Session = Depends(get_db)):
+    return crud.list_client_messages(db, client_id)
+
+
+@app.put("/api/clients/{client_id}/messages/{message_id}", response_model=schemas.ClientMessageResponse)
+def update_client_message(
+    client_id: int,
+    message_id: int,
+    payload: schemas.ClientMessageUpdate,
+    db: Session = Depends(get_db),
+):
+    updated = crud.update_client_message(db, client_id, message_id, payload)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="mensagem não encontrada")
+    return updated
+
+
+@app.delete("/api/clients/{client_id}/messages/{message_id}")
+def delete_client_message(client_id: int, message_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_client_message(db, client_id, message_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="mensagem não encontrada")
+    return {"success": True, "message": "Mensagem removida com sucesso"}
+
+
 @app.post("/api/contact", response_model=schemas.ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 def create_contact(
     payload: schemas.ContactMessageCreate,

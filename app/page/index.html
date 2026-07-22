@@ -306,6 +306,52 @@
         </div>
       </section>
 
+      <!-- Cliente -->
+      <section id="cliente" class="section">
+        <div class="container">
+          <div class="section-head">
+            <p class="mono-label">// área do cliente</p>
+            <h2 class="section-title">Minha Área</h2>
+            <p class="section-desc">Acesse suas mensagens e acompanhe o status.</p>
+          </div>
+
+          <div id="client-area-login" class="admin-card">
+            <div class="admin-login-form">
+              <div class="form-group">
+                <label for="client-email">E-mail</label>
+                <input type="email" id="client-email" placeholder="seu@email.com" />
+              </div>
+              <div class="form-group">
+                <label for="client-password">Senha</label>
+                <input type="password" id="client-password" placeholder="Digite sua senha" />
+              </div>
+              <button id="client-login-submit-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
+                <i data-lucide="log-in"></i> Entrar
+              </button>
+              <p id="client-login-error" class="admin-error" hidden></p>
+            </div>
+          </div>
+
+          <div id="client-area-dashboard" class="admin-card" hidden>
+            <div class="admin-toolbar">
+              <div>
+                <h3 class="admin-toolbar-title">Mensagens</h3>
+                <p id="client-welcome-text" class="section-desc"></p>
+              </div>
+              <div class="admin-news-actions">
+                <button id="client-logout-btn" type="button" class="btn bordered">
+                  <i data-lucide="log-out"></i> Logout
+                </button>
+                <button id="client-new-btn" type="button" class="btn btn-primary" style="width:auto;opacity:1">
+                  <i data-lucide="plus"></i> Nova Mensagem
+                </button>
+              </div>
+            </div>
+            <div id="client-messages-list" class="admin-news-list"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- Admin -->
       <section id="admin" class="section">
         <div class="container">
@@ -425,6 +471,47 @@
           <button type="button" id="client-register-cancel" class="btn bordered">Cancelar</button>
           <button type="submit" class="btn btn-primary" style="width:auto;opacity:1">
             <i data-lucide="user-plus"></i> Cadastrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Mensagem do Cliente -->
+  <div id="client-message-modal" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="client-message-modal-title" class="modal-title">Nova Mensagem</h3>
+        <button id="client-message-modal-close" class="icon-btn" aria-label="Fechar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form id="client-message-form" class="modal-form">
+        <input type="hidden" id="client-message-id" />
+        <div class="form-group">
+          <label for="client-message-title">Título</label>
+          <input type="text" id="client-message-title" required maxlength="250" />
+        </div>
+        <div class="form-group">
+          <label for="client-message-content">Mensagem</label>
+          <textarea id="client-message-content" rows="6" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="client-message-attachment">Arquivo Anexado</label>
+          <input type="text" id="client-message-attachment" placeholder="https://..." />
+        </div>
+        <div class="form-group">
+          <label for="client-message-status">Status</label>
+          <select id="client-message-status">
+            <option value="pendente">Pendente</option>
+            <option value="respondido">Respondido</option>
+            <option value="em andamento">Em andamento</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="client-message-modal-cancel" class="btn bordered">Cancelar</button>
+          <button type="submit" id="client-message-save" class="btn btn-primary" style="width:auto;opacity:1">
+            <i data-lucide="save"></i> Salvar
           </button>
         </div>
       </form>

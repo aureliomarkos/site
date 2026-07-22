@@ -27,6 +27,19 @@ class Client(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+class ClientMessage(Base):
+    __tablename__ = "client_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, nullable=False, index=True)
+    title = Column(String(250), nullable=False)
+    message = Column(Text, nullable=False)
+    attachment = Column(String(500), nullable=True)
+    status = Column(String(50), nullable=False, default="pendente")
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
 class News(Base):
     __tablename__ = "news"
 

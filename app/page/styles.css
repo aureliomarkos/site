@@ -1507,6 +1507,64 @@ main {
 /* ============================================
    Painel Administrativo
 ============================================ */
+.client-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.client-message-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  transition: border-color 0.15s;
+}
+
+.client-message-card:hover {
+  border-color: var(--primary);
+}
+
+.client-message-main {
+  min-width: 0;
+}
+
+.client-message-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.client-message-meta {
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.client-message-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.client-message-actions .icon-btn {
+  width: 2rem;
+  height: 2rem;
+}
+
+.client-message-actions .icon-btn.edit-btn {
+  color: var(--accent);
+}
+
+.client-message-actions .icon-btn.delete-btn {
+  color: #ef4444;
+}
+
 .admin-card {
   padding: 1.5rem;
   border: 1px solid var(--border);
