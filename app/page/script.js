@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: "servidor fora do ar" }))
-        throw new Error(errorData.detail || "servidor fora do ar")
+        throw new Error(parseServerError(errorData))
       }
 
       clientRegisterForm.reset()
@@ -300,6 +300,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
+  function parseServerError(errorData) {
+    const raw = errorData?.detail
+    if (Array.isArray(raw)) {
+      return raw.map((e) => e.msg || "erro de validação").join("; ")
+    }
+    if (typeof raw === "string" && raw) return raw
+    return "erro desconhecido no servidor"
+  }
+
   clientLoginSubmitBtn?.addEventListener("click", async () => {
     const email = clientEmailInput.value.trim()
     const password = clientPasswordInput.value.trim()
@@ -317,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: "credenciais inválidas" }))
-        throw new Error(errorData.detail || "credenciais inválidas")
+        throw new Error(parseServerError(errorData))
       }
       clientAuth = await response.json()
       localStorage.setItem("markosdev_client_auth", JSON.stringify(clientAuth))
