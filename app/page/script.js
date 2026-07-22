@@ -223,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let blogPage = 0
   let blogTotal = 0
   let blogItems = []
+  let blogShowAll = false
 
   function formatDateTime(iso) {
     const date = new Date(iso)
@@ -253,8 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
     items.forEach((item, index) => {
       const li = document.createElement("li")
       li.className = "blog-list-item"
+      const itemNumber = blogShowAll ? index + 1 : blogPage * blogPageSize + index + 1
       li.innerHTML = `
-        <span class="blog-list-number" style="color: ${blogColors[index % blogColors.length]}">${index + 1}</span>
+        <span class="blog-list-number" style="color: ${blogColors[index % blogColors.length]}">${itemNumber}</span>
         <button class="blog-list-button" type="button" data-id="${item.id}">${item.title}</button>
       `
       blogList.appendChild(li)
@@ -270,29 +272,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateBlogIndex() {
-    blogPrev.disabled = blogPage <= 0
-    blogNext.disabled = (blogPage + 1) * blogPageSize >= blogTotal
+    blogPrev.disabled = blogShowAll || blogPage <= 0
+    blogNext.disabled = blogShowAll || (blogPage + 1) * blogPageSize >= blogTotal
+    blogAll.textContent = blogShowAll ? "Voltar para a navegação" : "Ver todas as notícias"
   }
 
-  async function loadBlogPage(page = 0) {
+  async function loadBlogPage(page = 0, showAll = false) {
     try {
+      const skip = showAll ? 0 : page * blogPageSize
+      const limit = showAll ? 1000 : blogPageSize
       const [newsRes, countRes] = await Promise.all([
-        fetch(`/api/news?skip=${page * blogPageSize}&limit=${blogPageSize}`),
+        fetch(`/api/news?skip=${skip}&limit=${limit}`),
         fetch("/api/news/count"),
       ])
 
       if (!newsRes.ok || !countRes.ok) throw new Error("Erro ao carregar notícias")
 
-      blogItems = await newsRes.json()
       const countData = await countRes.json()
-      blogTotal = countData.total
-      blogPage = page
+      blogItems = await newsRes.json()
+      blogTotal = showAll ? blogItems.length : countData.total
+      blogPage = showAll ? 0 : page
+      blogShowAll = showAll
 
       renderBlogList(blogItems)
       updateBlogIndex()
 
       if (blogItems.length > 0) {
-        renderFeatured(blogItems[0])
+        const selected = blogItems.find((item) => item.id === blogItems[0].id) || blogItems[0]
+        renderFeatured(selected)
       } else {
         blogFeatured.innerHTML = `<p class="blog-empty">Nenhuma notícia encontrada.</p>`
       }
@@ -318,15 +325,19 @@ document.addEventListener("DOMContentLoaded", () => {
     observer.observe(blogSection)
 
     blogPrev.addEventListener("click", () => {
-      if (blogPage > 0) loadBlogPage(blogPage - 1)
+      if (!blogShowAll && blogPage > 0) loadBlogPage(blogPage - 1)
     })
 
     blogNext.addEventListener("click", () => {
-      if ((blogPage + 1) * blogPageSize < blogTotal) loadBlogPage(blogPage + 1)
+      if (!blogShowAll && (blogPage + 1) * blogPageSize < blogTotal) loadBlogPage(blogPage + 1)
     })
 
     blogAll.addEventListener("click", () => {
-      alert("Em breve: página com todas as notícias.")
+      if (blogShowAll) {
+        loadBlogPage(0, false)
+      } else {
+        loadBlogPage(0, true)
+      }
     })
   }
 

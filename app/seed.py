@@ -13,7 +13,7 @@ def seed_news():
             {
                 "title": "FastAPI se consolida como framework líder para APIs em Python",
                 "content": "O FastAPI continua ganhando espaço no ecossistema Python graças à sua alta performance, validação automática via Pydantic e documentação interativa gerada em tempo real. Empresas de todos os tamanhos adotam a ferramenta para construir microsserviços robustos e escaláveis.",
-                "image_url": "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&q=80",
+                "image_url": "https://objectstorage.sa-saopaulo-1.oraclecloud.com/n/gri3werw3xim/b/bucket-imagens/o/img-tech-1.jpg",
                 "published_at": datetime.utcnow() - timedelta(days=1),
             },
             {
@@ -25,7 +25,7 @@ def seed_news():
             {
                 "title": "Oracle Cloud Free Tier: hospede suas aplicações sem custo",
                 "content": "A Oracle Cloud oferece instâncias sempre gratuitas ideais para projetos pessoais, portfólios e pequenas APIs. Com VMs ARM e x86 disponíveis, desenvolvedores podem manter aplicações em produção sem pagar nada durante o ciclo de vida do projeto.",
-                "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+                "image_url": "https://objectstorage.sa-saopaulo-1.oraclecloud.com/n/gri3werw3xim/b/bucket-imagens/o/img-tech-2.jpg",
                 "published_at": datetime.utcnow() - timedelta(days=7),
             },
             {
@@ -37,7 +37,7 @@ def seed_news():
             {
                 "title": "Docker para iniciantes: containerizando aplicações Python",
                 "content": "Docker simplifica o deploy de aplicações Python ao empacotar código, dependências e configurações em containers isolados. Com um Dockerfile bem escrito, é possível garantir que sua aplicação rode da mesma forma em desenvolvimento e produção.",
-                "image_url": "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800&q=80",
+                "image_url": "https://objectstorage.sa-saopaulo-1.oraclecloud.com/n/gri3werw3xim/b/bucket-imagens/o/img-docker-1.jpg",
                 "published_at": datetime.utcnow() - timedelta(days=14),
             },
             {
@@ -49,7 +49,7 @@ def seed_news():
             {
                 "title": "SQLAlchemy 2.0: novidades e padrões modernos",
                 "content": "A versão 2.0 do SQLAlchemy trouxe uma API mais consistente, suporte aprimorado a tipos e novas formas de consulta. Adotar esses padrões modernos melhora a legibilidade do código e facilita a manutenção de projetos de longo prazo.",
-                "image_url": "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&q=80",
+                "image_url": "https://objectstorage.sa-saopaulo-1.oraclecloud.com/n/gri3werw3xim/b/bucket-imagens/o/img-sqlalchemy-1.jpg",
                 "published_at": datetime.utcnow() - timedelta(days=30),
             },
         ]
