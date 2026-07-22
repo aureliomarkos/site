@@ -204,10 +204,15 @@ document.addEventListener("DOMContentLoaded", () => {
     items.forEach((item) => {
       const card = document.createElement("article")
       card.className = "client-message-card"
+      const statusClass = (item.status || "pendente").toLowerCase().replace(/\s+/g, "-")
+      const statusLabel = item.status || "pendente"
       card.innerHTML = `
         <div class="client-message-main">
           <h4 class="client-message-title">${item.title}</h4>
-          <p class="client-message-meta">${formatClientMessageDateTime(item.created_at)} · ${item.status || "pendente"}</p>
+          <div class="client-message-meta">
+            <span>${formatClientMessageDateTime(item.created_at)}</span>
+            <span class="admin-msg-status ${statusClass}">${statusLabel}</span>
+          </div>
         </div>
         <div class="client-message-actions">
           <button class="icon-btn edit-btn" data-id="${item.id}" aria-label="Editar"><i data-lucide="pencil"></i></button>
