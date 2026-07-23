@@ -159,6 +159,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const clientMessageContent = document.getElementById("client-message-content")
   const clientMessageAttachment = document.getElementById("client-message-attachment")
   const clientMessageSave = document.getElementById("client-message-save")
+  const clientMessageResponseGroup = document.getElementById("client-message-response-group")
+  const clientMessageResponse = document.getElementById("client-message-response")
 
   let clientAuth = null
   let clientMessages = []
@@ -206,12 +208,14 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "client-message-card"
       const statusClass = (item.status || "pendente").toLowerCase().replace(/\s+/g, "-")
       const statusLabel = item.status || "pendente"
+      const hasResponse = item.message_response ? '<span class="admin-msg-status resolvido" style="margin-left:0.5rem">respondido</span>' : ''
       card.innerHTML = `
         <div class="client-message-main">
           <h4 class="client-message-title">${item.title}</h4>
           <div class="client-message-meta">
             <span>${formatClientMessageDateTime(item.created_at)}</span>
             <span class="admin-msg-status ${statusClass}">${statusLabel}</span>
+            ${hasResponse}
           </div>
         </div>
         <div class="client-message-actions">
@@ -256,6 +260,13 @@ document.addEventListener("DOMContentLoaded", () => {
     clientMessageTitle.value = message?.title || ""
     clientMessageContent.value = message?.message || ""
     clientMessageAttachment.value = message?.attachment || ""
+    if (message && message.message_response) {
+      clientMessageResponseGroup.hidden = false
+      clientMessageResponse.value = message.message_response
+    } else {
+      clientMessageResponseGroup.hidden = true
+      clientMessageResponse.value = ""
+    }
     clientMessageModal.hidden = false
     clientMessageTitle.focus()
   }
@@ -434,6 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (hash === "#admin-mensagens") {
           panelNoticias.hidden = true
           panelMensagens.hidden = false
+          loadAdminClientMessages()
         }
       }
     }
@@ -954,6 +966,10 @@ document.addEventListener("DOMContentLoaded", () => {
     panelNoticias.hidden = panel !== "noticias"
     panelMensagens.hidden = panel !== "mensagens"
 
+    if (panel === "mensagens") {
+      loadAdminClientMessages()
+    }
+
     // Atualizar active state nos itens do submenu
     adminSubmenuItems.forEach((item) => {
       const href = item.getAttribute("href")
@@ -1002,10 +1018,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const msgDetailCancel = document.getElementById("admin-msg-detail-cancel")
   const msgDetailTitle = document.getElementById("admin-msg-detail-title")
   const msgDetailClient = document.getElementById("admin-msg-detail-client")
-  const msgDetailDate = document.getElementById("admin-msg-detail-date")
   const msgDetailStatus = document.getElementById("admin-msg-detail-status")
   const msgDetailBody = document.getElementById("admin-msg-detail-body")
   const msgDetailId = document.getElementById("admin-msg-detail-id")
+  const msgDetailResponse = document.getElementById("admin-msg-detail-response")
+  const msgDetailSaveResponse = document.getElementById("admin-msg-detail-save-response")
 
   let adminClientMessages = []
 
@@ -1054,6 +1071,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <span>${formatAdminDateTime(item.created_at)}</span>
         </div>
         <p class="admin-msg-preview">${item.message}</p>
+        ${item.message_response ? '<p class="admin-msg-preview" style="color:var(--primary);margin-top:0.25rem"><strong>Resposta:</strong> ' + item.message_response + '</p>' : ''}
       `
 
       card.addEventListener("click", () => openMsgDetail(item))
@@ -1064,9 +1082,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function openMsgDetail(item) {
     msgDetailId.value = item.id
     msgDetailTitle.textContent = item.title
-    msgDetailClient.textContent = `${item.client_name} — ${item.client_email}`
-    msgDetailDate.textContent = formatAdminDateTime(item.created_at)
+    msgDetailClient.textContent = `${item.client_name} — ${item.client_email} · ${formatAdminDateTime(item.created_at)}`
     msgDetailBody.textContent = item.message
+    msgDetailResponse.value = item.message_response || ""
 
     const statusClass = (item.status || "pendente").toLowerCase().replace(/\s+/g, "-")
     msgDetailStatus.textContent = item.status || "pendente"
@@ -1103,6 +1121,24 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Erro ao atualizar status da mensagem.")
       }
     })
+  })
+
+  // Salvar resposta do admin
+  msgDetailSaveResponse?.addEventListener("click", async () => {
+    const id = Number(msgDetailId.value)
+    const responseText = msgDetailResponse.value.trim()
+    try {
+      const res = await fetch(`/api/admin/client-messages/${id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({ message_response: responseText }),
+      })
+      if (!res.ok) throw new Error("Erro ao salvar resposta")
+      closeMsgDetail()
+      await loadAdminClientMessages()
+    } catch (err) {
+      alert("Erro ao salvar resposta.")
+    }
   })
 
   function renderNewsList(news) {

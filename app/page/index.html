@@ -522,6 +522,10 @@
           <label for="client-message-attachment">Arquivo Anexado</label>
           <input type="text" id="client-message-attachment" placeholder="https://..." />
         </div>
+        <div class="form-group" id="client-message-response-group" hidden>
+          <label for="client-message-response">Resposta do Administrador</label>
+          <textarea id="client-message-response" rows="4" readonly class="readonly-field"></textarea>
+        </div>
         <div class="modal-actions">
           <button type="button" id="client-message-modal-cancel" class="btn bordered">Cancelar</button>
           <button type="submit" id="client-message-save" class="btn btn-primary" style="width:auto;opacity:1">
@@ -591,16 +595,16 @@
           <div class="detail-field" id="admin-msg-detail-client"></div>
         </div>
         <div class="form-group">
-          <label>Data</label>
-          <div class="detail-field" id="admin-msg-detail-date"></div>
-        </div>
-        <div class="form-group">
           <label>Status</label>
           <div class="detail-field"><span id="admin-msg-detail-status" class="admin-msg-detail-status admin-msg-status pendente">pendente</span></div>
         </div>
         <div class="form-group">
           <label>Mensagem</label>
           <div class="detail-field detail-field-scroll" id="admin-msg-detail-body"></div>
+        </div>
+        <div class="form-group">
+          <label for="admin-msg-detail-response">Resposta</label>
+          <textarea id="admin-msg-detail-response" rows="4" placeholder="Digite sua resposta ao cliente..."></textarea>
         </div>
         <div class="admin-msg-detail-actions">
           <button data-admin-msg-status="pendente" class="btn bordered" style="width:auto;opacity:1">
@@ -614,6 +618,9 @@
           </button>
         </div>
         <div class="modal-actions">
+          <button type="button" id="admin-msg-detail-save-response" class="btn btn-primary" style="width:auto;opacity:1">
+            <i data-lucide="save"></i> Salvar Resposta
+          </button>
           <button type="button" id="admin-msg-detail-cancel" class="btn bordered">Fechar</button>
         </div>
       </div>

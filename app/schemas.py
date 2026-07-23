@@ -59,6 +59,7 @@ class ClientMessageUpdate(BaseModel):
     message: Optional[str] = Field(None, min_length=5)
     attachment: Optional[str] = None
     status: Optional[str] = None
+    message_response: Optional[str] = None
 
 
 class ClientMessageResponse(BaseModel):
@@ -68,6 +69,7 @@ class ClientMessageResponse(BaseModel):
     message: str
     attachment: Optional[str] = None
     status: str
+    message_response: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -84,6 +86,7 @@ class AdminClientMessageResponse(BaseModel):
     message: str
     attachment: Optional[str] = None
     status: str
+    message_response: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

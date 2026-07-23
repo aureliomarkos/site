@@ -1924,6 +1924,13 @@ main {
   white-space: pre-wrap;
 }
 
+.readonly-field {
+  background: var(--muted);
+  color: var(--foreground);
+  cursor: default;
+  resize: none;
+}
+
 .admin-msg-detail-status {
   font-family: var(--font-mono);
   font-size: 0.75rem;

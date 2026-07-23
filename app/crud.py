@@ -73,6 +73,7 @@ def list_all_client_messages_admin(db: Session):
             "message": msg.message,
             "attachment": msg.attachment,
             "status": msg.status,
+            "message_response": msg.message_response,
             "created_at": msg.created_at,
             "updated_at": msg.updated_at,
         })
@@ -105,6 +106,7 @@ def admin_update_client_message(db: Session, message_id: int, message: schemas.C
         "message": db_message.message,
         "attachment": db_message.attachment,
         "status": db_message.status,
+        "message_response": db_message.message_response,
         "created_at": db_message.created_at,
         "updated_at": db_message.updated_at,
     }

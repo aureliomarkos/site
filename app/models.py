@@ -36,6 +36,7 @@ class ClientMessage(Base):
     message = Column(Text, nullable=False)
     attachment = Column(String(500), nullable=True)
     status = Column(String(50), nullable=False, default="pendente")
+    message_response = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
